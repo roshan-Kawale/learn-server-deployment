@@ -13,12 +13,15 @@ This guide will teach you how to deploy this Node.js web server from your **Loca
       ▼                                 ▼
 [Server Laptop] <───────────────────────┘
       │
-      ├── Runs Docker Container (port 3000)
+      ├── [Nginx Reverse Proxy Container] (Port 80)
+      │         │ (proxy_pass http://web:3000)
+      │         ▼
+      └── [Node.js Express App Container] (Internal Port 3000)
       │
-[Router Port Forwarding] (External Port 3000 ──> Server Laptop 3000)
+[Router Port Forwarding] (External Port 80 ──> Server Laptop 80)
       ▲
       │ (Public Access)
-[Internet User] ──> http://<YOUR_PUBLIC_IP>:3000
+[Internet User] ──> http://<YOUR_PUBLIC_IP>
 ```
 
 ---

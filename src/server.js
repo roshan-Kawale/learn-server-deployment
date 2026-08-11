@@ -9,6 +9,21 @@ const startTime = new Date();
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
 
+// HTTP Request Logging Middleware (logs method, path, status, duration, and client IP from Nginx)
+app.use((req, res, next) => {
+  const start = Date.now();
+  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown';
+
+  res.on('finish', () => {
+    // Exclude repetitive container healthcheck logs to keep logs clean
+    if (req.originalUrl !== '/api/health') {
+      console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} - ${Date.now() - start}ms - Client IP: ${clientIp}`);
+    }
+  });
+
+  next();
+});
+
 // API Health Check Endpoint
 app.get('/api/health', (req, res) => {
   const uptimeSeconds = Math.floor((Date.now() - startTime.getTime()) / 1000);

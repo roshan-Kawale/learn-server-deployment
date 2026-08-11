@@ -1,0 +1,22 @@
+{
+  "name": "learn-server-deploy",
+  "version": "1.0.0",
+  "description": "Simple Node.js Express server for learning SSH and Docker server deployment",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --check src/server.js"
+  },
+  "keywords": [
+    "express",
+    "docker",
+    "ssh",
+    "deployment"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

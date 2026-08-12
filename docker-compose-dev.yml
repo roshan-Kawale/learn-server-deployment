@@ -1,6 +1,5 @@
 services:
   web:
-    image: ghcr.io/roshan-kawale/learn-server-deployment-web:latest
     build:
       context: .
       dockerfile: Dockerfile

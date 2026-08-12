@@ -1,4 +1,4 @@
-name: CI/CD Level 2 Pipeline
+name: CI/CD Level 3 Pipeline (GHCR Registry)
 
 on:
   push:
@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   # 🧪 CI: Run syntax and validation checks
@@ -27,13 +31,30 @@ jobs:
       - name: Run Tests
         run: npm test
 
-  # 🚀 CD: SSH into server & rebuild Docker Compose stack via Cloudflare Tunnel
-  deploy:
-    name: Deploy to Production Server
+  # 🚀 CD: Build image in GitHub Cloud, push to GHCR, then pull & restart on Server
+  build-and-deploy:
+    name: Build Image & Deploy to Server
     needs: test
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image to GHCR
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/roshan-kawale/learn-server-deployment-web:latest
+
       - name: Deploy via SSH over Cloudflare Tunnel
         run: |
           # 1. Install cloudflared
@@ -53,7 +74,7 @@ jobs:
             ProxyCommand cloudflared access ssh --hostname %h
           EOF
 
-          # 3. Execute SSH deployment
-          echo "🚀 Starting automated deployment..."
-          ssh ${{ secrets.SERVER_HOST }} "cd C:\work\learn-server-deployment || cd C:\Users\rosha\learn-server-deployment & git pull origin main & docker compose up -d --build"
-          echo "✅ Deployment complete!"
+          # 3. Pull pre-built image from GHCR & restart stack (Zero compilation load on server)
+          echo "🚀 Pulling latest image from GHCR and restarting stack..."
+          ssh ${{ secrets.SERVER_HOST }} "cd C:\work\learn-server-deployment || cd C:\Users\rosha\learn-server-deployment & docker compose pull & docker compose up -d"
+          echo "✅ Level 3 Production Deployment Complete!"

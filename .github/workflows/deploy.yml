@@ -27,13 +27,21 @@ jobs:
       - name: Run Tests
         run: npm test
 
-  # 🚀 CD: SSH into server & rebuild Docker Compose stack
+  # 🚀 CD: SSH into server & rebuild Docker Compose stack via Cloudflare Tunnel
   deploy:
     name: Deploy to Production Server
     needs: test
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
+      - name: Setup Cloudflare Access for SSH
+        run: |
+          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+          mkdir -p ~/.ssh
+          echo "Host ${{ secrets.SERVER_HOST }}" >> ~/.ssh/config
+          echo "  ProxyCommand cloudflared access ssh --hostname %h" >> ~/.ssh/config
+
       - name: Execute Remote SSH Commands
         uses: appleboy/ssh-action@v1.0.3
         with:

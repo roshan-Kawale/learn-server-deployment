@@ -1,0 +1,49 @@
+name: CI/CD Level 2 Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+
+jobs:
+  # 🧪 CI: Run syntax and validation checks
+  test:
+    name: Run Syntax & Lint Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm test
+
+  # 🚀 CD: SSH into server & rebuild Docker Compose stack
+  deploy:
+    name: Deploy to Production Server
+    needs: test
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute Remote SSH Commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            echo "🚀 Starting automated deployment..."
+            cd learn-server-deployment || cd ~/learn-server-deployment
+            git pull origin main
+            docker compose up -d --build
+            echo "✅ Deployment complete!"

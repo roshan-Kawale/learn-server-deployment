@@ -55,5 +55,5 @@ jobs:
 
           # 3. Execute SSH deployment
           echo "🚀 Starting automated deployment..."
-          ssh ${{ secrets.SERVER_HOST }} "cd learn-server-deployment || cd ~/learn-server-deployment && git pull origin main && docker compose up -d --build"
+          ssh ${{ secrets.SERVER_HOST }} "cd C:\work\learn-server-deployment || cd C:\Users\rosha\learn-server-deployment & git pull origin main & docker compose up -d --build"
           echo "✅ Deployment complete!"

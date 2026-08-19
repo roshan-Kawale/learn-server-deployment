@@ -45,11 +45,11 @@ This document outlines the completed milestones and future phases for mastering 
 
 ---
 
-## 🟠 Phase 5: High Availability & Load Balancing
+## 🟠 Phase 5: High Availability & Load Balancing (Completed ✅)
 
-- [ ] **Horizontal Scaling**: Scale Node.js application instances using `docker compose up -d --scale web=3`.
-- [ ] **Nginx Upstream Load Balancer**: Configure `upstream node_app` in `nginx.conf` to distribute requests across multiple Express instances.
-- [ ] **Zero-Downtime Rolling Updates**: Use `docker compose up -d --no-deps --scale` for seamless code updates.
+- [x] **Horizontal Scaling**: Scale Node.js application instances using `docker compose up -d --scale web=3`.
+- [x] **Nginx Upstream Load Balancer**: Configure `upstream node_app` in `nginx.conf` to distribute requests across multiple Express instances.
+- [x] **Zero-Downtime Rolling Updates**: Use `docker compose up -d --no-deps --scale` for seamless code updates.
 
 ---
 

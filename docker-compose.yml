@@ -4,7 +4,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: node_deploy_app
     restart: unless-stopped
     expose:
       - "3000"
